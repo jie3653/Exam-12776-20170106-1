@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Film</title>
+<title>Insert title here</title>
+<!-- 引入js文件 -->
+<link rel="stylesheet"
+	href="https://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+<script
+	src="https://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+<script
+	src="https://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script 
+	type="text/javascript" src="js/jquery-2.1.4.js"></script>   
+</head>
+<body>
+	<!-- 查询条件表单 -->
+	<form>
+		filmId<input id="filmId" name="filmId">
+		title<input id="title" name="title">
+		<input id="query" type="button"value="查询">
+	</form><br/>
+	<a href="/Exam-12776-20170106-1/html/insertFilm.html">添加Film</a>
+	<table width="1200" border="1" cellspacing="0" cellpadding="0">
+		<tbody id="filmsTbody">
+			<tr>
+				<th>film_id</th>
+				<th>title</th>
+				<th>description</th>
+				<th>language</th>
+				<th>操作</th>
+			</tr>
+		</tbody>
+			<tr>
+				<td colspan="5"><a href="javaScript:;"onclick="nextPage(-1)">[上一页</a>当前第<input id="current"></input>页  共<input id="count"></input>页 <a href="javaScript:;"onclick="nextPage(1)">下一页]</a>
+					[共<input id="totals"></input>条 每页显示<select id="size"name="pageSize">
+					<option value="10">10</option>
+					<option value="20">20</option>
+					<option value="50">50</option>
+					</select>条]</td>
+			</tr>
+	</table>
+
+<script>
+	//在函数外的直接执行
+	var url="/Exam-12776-20170106-1/queryFilms.action";
+	//首次访问不传参
+	$.getJSON(url,{},function(page){//回调函数
+		var currentPage=page['currentPage'];
+		var total=page['total'];
+		var pageCount=page['pageCount'];
+		$("#totals").val(total);
+		$("#current").val(currentPage);
+		$("#count").val(pageCount);
+		var list=page['data'];
+		//遍历film
+	    $.each(list, function(index,film) {
+	        var tbody=$("#filmsTbody");
+	        var language=film["language"];
+	        tbody.append("<tr>");
+	        tbody.append("<td>" + film["filmId"] + "</td>");
+	        tbody.append("<td>" + film["title"] + "</td>");
+	        tbody.append("<td>" + film["description"] + "</td>");
+	        tbody.append("<td>" + language["name"] + "</td>");
+	        tbody.append('<td><a href="" >删除</a><a href="" >修改</a></td>');
+	        tbody.append("</tr>");
+	    });  
+	});
+	$(function(){
+		//查询film方法
+		function queryFilms(current){
+			alert("query");
+			var tbody=$("#filmsTbody").empty();
+			var pageSize=$("#size").val();
+		    var qfilmId=$("#filmId").val();
+		    var qtitle=$("#title").val();
+		    var url="/Exam-12776-20170106-1/queryFilms.action";
+		    $.get(url,{currentPage:current,
+		              pageSize:pageSize,
+		              filmId:qfilmId,
+		              title:qtitle},function(page){//回调函数
+		            	var currentPage=page['currentPage'];
+		          		var total=page['total'];
+		          		var pageCount=page['pageCount'];
+		          		var pageSize = page['pageSize'];
+		          		$("#size").find("option[text='pageSize']").attr("selected",true); 
+		          		$("#totals").val(total);
+		          		$("#current").val(currentPage);
+		          		$("#count").val(pageCount);
+		          		var list=page['data'];
+		          		//遍历film
+		          	    $.each(list,function(index,film) {
+		          	        var tbody=$("#filmsTbody");
+		          	        var language=film["language"];
+		          	        tbody.append("<tr>");
+		          	        tbody.append("<td>" + film["filmId"] + "</td>");
+		          	        tbody.append("<td>" + film["title"] + "</td>");
+		          	        tbody.append("<td>" + film["description"] + "</td>");
+		          	        tbody.append("<td>" + language["name"] + "</td>");
+		          	        tbody.append('<td><a href="">删除</a><a href="" >修改</a></td>');
+		          	        tbody.append("</tr>");
+		        		});
+		   	 	},"json");
+		}
+		//查询操作
+		$("#query").click(function() {
+			alert("query");
+			var current=$("#current").val();
+			query(current);
+		});
+		$("#size").change(function(){
+			var current=$("#current").val();
+			query(current);
+	    	});
+		
+		$("#current").change(function(){
+			var current=$("#current").val();
+			query(current);
+	    	});
+		
+		function nextPage(index){
+			var current=$("#current").val()+index;
+			query(current);
+		}
+	});
+</script>
+</body>
+</html>
